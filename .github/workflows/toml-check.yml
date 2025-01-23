@@ -32,7 +32,9 @@ jobs:
           id: arena
           run: |
             {
-              echo "arena='$(python3 branch/.github/compare_toml.py base/Arena.toml branch/Arena.toml)'"
+              echo 'arena<<EOF'
+              python3 branch/.github/compare_toml.py base/Arena.toml branch/Arena.toml
+              echo 'EOF'
             } >> $GITHUB_OUTPUT
         - name: Check Gauntlet TOML
           id: gauntlet
