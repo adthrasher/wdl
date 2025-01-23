@@ -207,11 +207,15 @@ def compare_toml(file1, file2):
         else:
             #print("Document {} has the same diagnostics".format(doc))
             same_docs.append(doc)
-            
-    print("```{toggle} Documents with identical diagnostics")
-    for doc in same_docs:
-        print("Document {} has the same diagnostics".format(doc))
-    print("```")
+    
+    if len(same_docs) > 0:
+        print("<details>")
+        print("<summary>Documents with identical diagnostics</summary>")
+        print("```")
+        for doc in same_docs:
+            print("Document {} has the same diagnostics".format(doc))
+        print("```")
+        print("</details>")
         
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Compare two TOML files")
