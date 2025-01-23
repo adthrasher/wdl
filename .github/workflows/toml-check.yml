@@ -30,7 +30,7 @@ jobs:
           run: echo "$GITHUB_CONTEXT"
         - name: Check Arena TOML
           id: arena
-          run: echo "arena=$(python3 base/Arena.toml branch/Arena.toml)" >> $GITHUB_OUTPUT"
+          run: echo "arena=$(python3 base/Arena.toml branch/Arena.toml)" >> $GITHUB_OUTPUT
         - name: Check Gauntlet TOML
           id: gauntlet
           run: python3 base/Arena.toml branch/Arena.toml
