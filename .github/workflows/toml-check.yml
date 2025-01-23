@@ -29,7 +29,7 @@ jobs:
           run: |
             {
               echo 'arena<<EOF'
-              python3 branch/.github/compare_toml.py base/Arena.toml branch/Arena.toml
+              python3 branch/.github/compare_toml.py base/Arena.toml branch/Arena.toml | sed 's/`/\`/g'
               echo 'EOF'
             } >> $GITHUB_OUTPUT
         - name: Check Gauntlet TOML
@@ -37,20 +37,18 @@ jobs:
           run: |
             {
               echo 'gauntlet<<EOF'
-              python3 branch/.github/compare_toml.py base/Gauntlet.toml branch/Gauntlet.toml
+              python3 branch/.github/compare_toml.py base/Gauntlet.toml branch/Gauntlet.toml | sed 's/`/\`/g'
               echo 'EOF'
             } >> $GITHUB_OUTPUT
         - name: Write Arena results to comment
           uses: actions/github-script@v7
           with:
             script: |
-                var body = "${{ steps.arena.outputs.arena }}"
-                body = body.replace(/`/g, '\`')
                 github.rest.issues.createComment({
                     issue_number: context.issue.number,
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    body: "a"
+                    body: `${{ steps.arena.outputs.arena }}`
                 })
         - name: Write Gauntlet results to comment
           uses: actions/github-script@v7
@@ -62,7 +60,7 @@ jobs:
                     issue_number: context.issue.number,
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    body: "a"
+                    body: `${{ steps.gauntlet.outputs.gauntlet }}`
                 })
             
         
