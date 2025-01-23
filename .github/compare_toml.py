@@ -87,6 +87,9 @@ def compare_toml(file1, file2):
                 else:
                     break
     
+    print("<details>")
+    print("<summary>Repository details</summary>\n")
+    print("```")
     print("File {} contains {} repositories".format(file1, len(f1_repos)))
     print("File {} contains {} repositories".format(file2, len(f2_repos)))
     shared = {k: f1_repos[k] for k in f1_repos if k in f2_repos}
@@ -98,6 +101,8 @@ def compare_toml(file1, file2):
             print("Repository {} has different commit hashes:".format(repo))
             print("    File {}: {}".format(file1, f1_repos[repo]))
             print("    File {}: {}".format(file2, f2_repos[repo]))
+    print("```\n")
+    print("</details>")
       
     shared_documents = {k: f1_diagnostics[k] for k in f1_diagnostics if k in f2_diagnostics}
     f1_only_documents = {k: f1_diagnostics[k] for k in f1_diagnostics if k not in f2_diagnostics}
@@ -106,13 +111,17 @@ def compare_toml(file1, file2):
     # First deal with shared documents.
     # We're looking for differences in the diagnostics.
     same_docs = []
+    diff_docs = []
+    print("<details>")
+    print("<summary>Document differences</summary>\n")
+    print("```")
     for doc in shared_documents:
         checksum_count = 0
         checksum_line_count = 0
         content_count = 0
         # If the set of diagnostics is different, examine the differences
         if f1_diagnostics[doc] != f2_diagnostics[doc]:
-            print("Document {} has different diagnostics:".format(doc))
+            # print("Document {} has different diagnostics:".format(doc))
             # Look for the symmetric difference of the sets.
             # This is the set of elements that are in document one set but not the other.
             for diagnostic in f1_diagnostics[doc]:
@@ -142,14 +151,8 @@ def compare_toml(file1, file2):
 
                     if checksum is not None:
                         checksum_count += 1
-                        # print("    Checksum-only difference:")
-                        # print("    File {}: {}".format(file1, diagnostic["message"]))
-                        # print("    File {}: {}".format(file2, checksum["message"]))
                     elif checksum_line is not None:
                         checksum_line_count += 1
-                        # print("    Checksum and line number-only difference:")
-                        # print("    File {}: {}".format(file1, diagnostic["message"]))
-                        # print("    File {}: {}".format(file2, checksum_line["message"]))
                     elif content is not None:
                         content_count += 1
                         print("    Content difference:")
@@ -185,29 +188,39 @@ def compare_toml(file1, file2):
 
                     if checksum is not None:
                         checksum_count += 1
-                        # print("    Checksum-only difference:")
-                        # print("    File {}: {}".format(file1, diagnostic["message"]))
-                        # print("    File {}: {}".format(file2, checksum["message"]))
                     elif checksum_line is not None:
                         checksum_line_count += 1
-                        # print("    Checksum and line number-only difference:")
-                        # print("    File {}: {}".format(file1, diagnostic["message"]))
-                        # print("    File {}: {}".format(file2, checksum_line["message"]))
                     elif content is not None:
                         content_count += 1
-                        # print("    Content difference:")
-                        # print("    File {}: {}".format(file1, diagnostic["message"]))
-                        # print("    File {}: {}".format(file2, content["message"]))
                     else:
                         print("    No match found for:")
                         print("    File {}: {}".format(file1, diagnostic["message"]))
         
-            print("    File {}: {} checksum-only changes".format(file1, checksum_count/2))
-            print("    File {}: {} checksum and line number-only changes".format(file1, checksum_line_count/2))
+            diff_docs.append({
+                "doc": doc,
+                "checksum": checksum_count,
+                "checksum_line": checksum_line_count,
+                "content": content_count
+            })
+            # print("    File {}: {} checksum-only changes".format(file1, checksum_count/2))
+            # print("    File {}: {} checksum and line number-only changes".format(file1, checksum_line_count/2))
         else:
             #print("Document {} has the same diagnostics".format(doc))
             same_docs.append(doc)
+    print("```\n")
+    print("</details>")
     
+    if len(diff_docs) > 0:
+        print("<details>")
+        print("<summary>Documents with diagnostic differences</summary>\n")
+        print("```")
+        for doc in diff_docs:
+            print("Document {} has the following differences:".format(doc["doc"]))
+            print("    File {}: {} checksum-only changes".format(file1, doc["checksum"]/2))
+            print("    File {}: {} checksum and line number-only changes".format(file1, doc["checksum_line"]/2))
+        print("```\n")
+        print("</details>")
+        
     if len(same_docs) > 0:
         print("<details>")
         print("<summary>Documents with identical diagnostics</summary>\n")
