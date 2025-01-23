@@ -210,11 +210,11 @@ def compare_toml(file1, file2):
     
     if len(same_docs) > 0:
         print("<details>")
-        print("<summary>Documents with identical diagnostics</summary>")
+        print("<summary>Documents with identical diagnostics</summary>\n")
         print("```")
         for doc in same_docs:
             print("Document {} has the same diagnostics".format(doc))
-        print("```")
+        print("```\n")
         print("</details>")
         
 if __name__ == "__main__":
