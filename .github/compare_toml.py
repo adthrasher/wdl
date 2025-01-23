@@ -105,6 +105,7 @@ def compare_toml(file1, file2):
     
     # First deal with shared documents.
     # We're looking for differences in the diagnostics.
+    same_docs = []
     for doc in shared_documents:
         checksum_count = 0
         checksum_line_count = 0
@@ -204,7 +205,13 @@ def compare_toml(file1, file2):
             print("    File {}: {} checksum-only changes".format(file1, checksum_count/2))
             print("    File {}: {} checksum and line number-only changes".format(file1, checksum_line_count/2))
         else:
-            print("Document {} has the same diagnostics".format(doc))
+            #print("Document {} has the same diagnostics".format(doc))
+            same_docs.append(doc)
+            
+    print("```{toggle} Documents with identical diagnostics")
+    for doc in same_docs:
+        print("Document {} has the same diagnostics".format(doc))
+    print("```")
         
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Compare two TOML files")
