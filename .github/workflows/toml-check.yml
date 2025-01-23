@@ -3,7 +3,7 @@ name: toml-check
 on:
   push:
     branches:
-      - main
+        - '!main'
   pull_request:
 
 env:
@@ -13,13 +13,37 @@ jobs:
     toml-check:
         runs-on: ubuntu-latest
         steps:
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.10'
         - uses: actions/checkout@v4
+          with:
+            path: "base"
+            ref: ${{ github.base_ref }}
+        - uses: actions/checkout@v4
+          with:
+            path: "branch"
         - name: Dump GitHub context
           env:
             GITHUB_CONTEXT: ${{ toJson(github) }}
           run: echo "$GITHUB_CONTEXT"
         - name: Check Arena TOML
-          run: echo "hello"
+          id: arena
+          run: echo "arena=$(python3 base/Arena.toml branch/Arena.toml)" >> $GITHUB_OUTPUT"
         - name: Check Gauntlet TOML
-          run: echo "world"
+          id: gauntlet
+          run: python3 base/Arena.toml branch/Arena.toml
+        - name: Write Arena results to comment
+          uses: actions/github-script@v7
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            script: |
+                github.rest.issues.createComment({
+                    issue_number: context.issue.number,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    body: ${{ steps.arena.outputs.arena }}
+                })
+            
         
